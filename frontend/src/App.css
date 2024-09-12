@@ -1,5 +1,64 @@
-*{
+/* *{
   margin: 0;
   padding: 0;
-  
+  box-sizing: border-box;
+} */
+
+.landindPageContainer{
+  width: 100vw;
+  height: 100vh;
+  background: url("/public/backGround.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.landindPageContainer nav{
+  padding-inline: 1.7rem;
+  padding-block: 1.6rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.landindPageContainer nav h2{
+  font-size: 1.8rem;
+  font-weight: 500;
+}
+
+.landindPageContainer nav .navList{
+   display: flex;
+   gap:1.6rem;
+   cursor: pointer;
+}
+
+.landingMainContainer{
+display: flex;
+justify-content: space-between;
+padding-inline: 3rem;
+height: 70vh;
+align-items: center;
+}
+
+.landingMainContainer > div:nth-child(1){
+ font-size: 1.2rem;
+}
+
+.landingMainContainer > div:nth-child(1) div[role='button']{
+  background: #c05e03;
+  width: fit-content;
+  padding: 1rem;
+  text-decoration: none;
+  border-radius: 23px;
+ }
+
+ .landingMainContainer > div:nth-child(1) div[role='button'] a{
+   text-align: none;
+   color: white;
+   font-size: 1.7rem;
+   margin-top: 1.9rem;
+}
+
+.landingMainContainer > div:nth-last-child(2) img{
+height: 70vh;
+width: auto;
 }
