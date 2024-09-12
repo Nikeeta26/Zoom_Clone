@@ -4,7 +4,15 @@ let connection  = {};//how many connect
 let message = {}; // message
 let timeOnline = {}; //time
 export const connectToServer = (server)=>{
-    const io = new Server(server);
+    const io = new Server(server,{
+        cors:{                //this is use for testing not in production level
+            origin: "*",
+            methods: ["GET","POST"],
+            allowedHeaders: ["*"],
+            credentials: true
+
+        }
+    })
     io.on("connection",(socket)=>{//connect socket
        
 
@@ -37,17 +45,62 @@ export const connectToServer = (server)=>{
 
          socket.on("signal",(toId,message)=>{
             io.to(toId).emit("signal",socket.id,message);
-
+              
          })
 
 
         socket.on("chat-message",(data,sender) => {
- 
+
+            const [matchingRoom, found] = Object.entries(connection) //find people
+            .reduce(([room, isFound], [roomKey, roomValue]) => {
+                if(!isFound && roomValue.includes(socket.id)){
+                   return [roomKey, true];
+                }
+
+                return [room, isFound];
+            }, [' ', false]);
+
+        if(found === true){
+            if(message[matchingRoom] === undefined){//check message is null or not
+                message[matchingRoom] = [];
+            }
+
+            message[matchingRoom].push({'sender':sender, 'data':data, 'socket-id-sender':socket.id})
+            console.log("message", key, ":",sender," ",data);
+
+             //send data
+             connection[matchingRoom].forEach((ele) => {
+                io.to(ele).emit('chat-message', data, sender, socket.id)
+             })
+        }
 
         })
 
         socket.on("disconnection",()=>{
+            
+            var difference = Math.abs(timeOnline[socket.id] - new Date())
 
+            var key;
+
+            for(const [k, v] of JSON.parse(JSON.stringify(Object.entries(connection)))){
+
+                for(let a=0; a<v.length; a++){
+                    key = k;
+
+                    for(let a=0; a<connection[key].length; ++a){
+                        io.to(connection[key][a]).emit('user-left', socket.id)
+                    }
+
+                    var index = connection[key].indexOf(socket.id)
+
+                    connection[key].splice(index, 1);
+                       
+                    if(connection[key].length === 0){
+                        delete connection[key];
+                    }
+
+                }
+            }
 
         })
     });

@@ -3,30 +3,34 @@ import httpStatus from "http-status";
 import bcrypt ,{hash} from "bcrypt";
 import crypto from "crypto";
 
-const login = async(req,res)=>{
-   const{username,password} = req.body;
-     if(!username ||!password){
-        return res.status(400).json({messege:"Please provide"});
-     }
-    // try{
-        const user  = await  User.findOne({username});
-        if(!user){
-         return res.status(httpStatus.NOT_FOUND).json({messege:"user not fount"});
+const login = async (req, res) => {
+    const { username, password } = req.body;
+    if (!username || !password) {
+        return res.status(400).json({ message: "Please provide both username and password." });
+    }
+
+    try {
+        const user = await User.findOne({ username });
+        if (!user) {
+            return res.status(httpStatus.NOT_FOUND).json({ message: "User not found" });
         }
-        if(bcrypt.compare(password, user.password)){
 
-            let token = crypto.randomBytes(20).toString("hex");    //store token
-            
-            user.token = token;
-
-            await user.save();
-
-            return res.status(httpStatus.OK).json({token:token});
+        // Ensure user.password is defined and compare it with the provided password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: "Invalid credentials" });
         }
-    // } catch(err){
-    //     return res.status(500).json({messege:`something went wrong ${err}`});
-    // }
-}
+
+        let token = crypto.randomBytes(20).toString("hex"); // Store token
+        user.token = token;
+
+        await user.save();
+
+        return res.status(httpStatus.OK).json({ token: token });
+    } catch (err) {
+        return res.status(500).json({ message: `Something went wrong: ${err.message}` });
+    }
+};
 
 
 const register = async(req,res)=>{
