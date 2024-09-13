@@ -5,6 +5,7 @@ import './App.css'
 import LandingPage from './pages/landing';
 import Authentication from './pages/authentication'
 import {Route,Routes,BrowserRouter as Router} from 'react-router-dom';
+import { AuthProvider } from './contents/AuthContenr';
 
 
 function App() {
@@ -14,12 +15,14 @@ function App() {
     <>
       <div>
 <Router>
+  <AuthProvider>
   <Routes>
     <Route path='/'  element={<LandingPage/>} />
 
     <Route path='/auth' element={<Authentication />} />
 
   </Routes>
+  </AuthProvider>
 </Router>
 </div>
     </>
