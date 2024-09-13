@@ -5,7 +5,7 @@ import './App.css'
 import LandingPage from './pages/landing';
 import Authentication from './pages/authentication'
 import {Route,Routes,BrowserRouter as Router} from 'react-router-dom';
-import { AuthProvider } from './contents/AuthContenr';
+import { AuthProvider } from './contents/AuthContext';
 
 
 function App() {
