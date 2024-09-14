@@ -17,9 +17,7 @@ const login = async (req, res) => {
 
         // Ensure user.password is defined and compare it with the provided password
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: "Invalid credentials" });
-        }
+        if (isMatch) {
 
         let token = crypto.randomBytes(20).toString("hex"); // Store token
         user.token = token;
@@ -27,6 +25,10 @@ const login = async (req, res) => {
         await user.save();
 
         return res.status(httpStatus.OK).json({ token: token });
+        }
+        else{
+            return res.status(httpStatus.UNAUTHORIZED).json({message:"Invalid user and password "})
+        }
     } catch (err) {
         return res.status(500).json({ message: `Something went wrong: ${err.message}` });
     }
