@@ -51,7 +51,7 @@ export const AuthProvider = ({children}) =>{
     }
 
     const data = {
-        userData, setUserData, handleRegister
+        userData, setUserData, handleRegister,handleLogin
     }
 
     return (
