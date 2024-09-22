@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from "react";
 import { useState } from "react";
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import { io } from "socket.io-client";
+
 
 import "../style/videoMeeting.css";
 
@@ -99,7 +101,7 @@ export default function VideoMeeting() {
           }
 
         }catch(err){
-           console.log("error occurse"+err);
+           console.log("error occurse",err);
         }
     }
 
@@ -108,25 +110,69 @@ export default function VideoMeeting() {
        getPermission();
     }, []);
 
+    
+   let getUserMediaSuccess = (strem) =>{
+/* when i stop my audio/ video then it close from all computer or 
+      when i mute my audio then this mute from all computer*/
+
+   }
+
     let getUserMedia = () =>{
     if((video && videoAvailable) || (audio && audioAvailable)){
         navigator.mediaDevices.getUserMedia({video:video, audio:audio})
-        .then(getUserMedia)
+        .then((getUserMediaSuccess)=>{})// TODO : getUserMeadia
+        .then((g)=>{})
+        .catch((e)=>{
+          console.log(e);
+        })
+    } 
+    else{
+          try{
+               let tracks = localVideoRef.current.srcObject.getTracks();//if any problem occurre then get tracks 
+               tracks.forEach(track => track.stop());// stop all tracks
+          } catch(e){
+
+          }
     }
     }
 
     useEffect(() => {
         if(video !== undefined && audio !== undefined) {
-             getUserMedia();
+             getMedia();
         }
     },[audio, video])
 
+    let getMessageFromServer = (fromId, message) =>[
+
+    ]
+
+let connectToSocketServer = () => { 
+     socketRef.current = io.connect(server_url, {secure: false})//connect to backend connectToSocketServer usinf io
+
+    socketRef.current.on('signal',getMessageFromServer)//emmit message catch here
+   
+    socketRef.current.on("connect", ()=> { //connect
+
+      socketRef.current.emit("join-call",window.location.href)
+
+      socketIdRef.current = socketRef.current.id
+
+    })
+  
+  }
 
     let getMedia = () => {
         setVedio(videoAvailable);
         setAudio(audioAvailable);
         connectToSocketServer();
     }
+
+    let connect = () => {
+      // for connect
+      setaskForUsername(false);
+      getMedia();
+    }
+
     return (
         // <div>VedioMeeting Component{window.location.href}</div>  //where you now
         <div>
@@ -136,7 +182,7 @@ export default function VideoMeeting() {
                  
                 <TextField id="outlined-basic" label="Outlined" variant="outlined" value={username} onChange={e => setUsername(e.target.value)}/>
 
-                <Button variant="contained">Connect</Button>
+                <Button variant="contained" onClick={connect}>Connect</Button>
 
                 <div>
                     <video ref={localVideoRef} autoPlay muted></video>
