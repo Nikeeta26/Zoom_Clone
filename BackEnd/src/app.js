@@ -22,7 +22,7 @@ const io = connectToServer(server);
 // const io = new Server(server);
 // app.use(userRoutes)
 app.set("port",(process.env.PORT || 8000));
-app.use(cors());
+app.use(cors("http://localhost:5173/"));
 app.use(express.json({"limit":"40kb"}));
 app.use(express.urlencoded({"limit":"40kb",extended:true}));
 
