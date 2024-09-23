@@ -146,6 +146,13 @@ export default function VideoMeeting() {
 
     ]
 
+
+// TODO addMessage
+let addMessage = () => {
+
+}
+
+
 let connectToSocketServer = () => { 
      socketRef.current = io.connect(server_url, {secure: false})//connect to backend connectToSocketServer usinf io
 
@@ -156,6 +163,60 @@ let connectToSocketServer = () => {
       socketRef.current.emit("join-call",window.location.href)
 
       socketIdRef.current = socketRef.current.id
+
+      socketRef.current.on("chat-message",addMessage)
+
+      socketRef.current.on('user-left',(id) => {
+        
+        setVedio((video) => videos.filter((video) => video.socketIdRef !== id))
+
+      })
+
+      socketRef.current.on('user-joined',(id, clients) => {
+        clients.forEach((socketListId) =>{
+           
+          connection[socketListId] = new RTCPeerConnection(peerConfigConnection)
+
+          connection[socketListId].onicecandidate = (event) => {
+            // ice basically protocol
+            // connect client
+            if(event.candidate !== null){
+              socketRef.current.emit("signal",socketListId,JSON.stringify({'ice':event.candidate}))
+            }
+          }
+
+          connection[socketListId].onaddstream = (event) => {
+                    
+            let videoExist = videoRef.current.find(video => video.socketId === socketListId);
+
+            if(videoExist) {
+              setVedio(video => {
+                  const updateVideos = video.map(video => 
+                    video.socketId === socketListId ? {...video, stream: event.stream} : video
+                   );
+                   videoRef.current = updateVideos;
+                   return updateVideos
+              })
+            }
+            else{
+                
+              let newVideo = {
+                socketId : socketListId,
+                stream : event.stream,
+                autoPlay : true,
+                playinline : true
+              }
+
+              setVedios(video => {
+                const updateVideo = [...video, newVideo];
+                videoRef.updateVideos;
+              });
+            }
+          };
+
+
+        })
+      })
 
     })
   
